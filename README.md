@@ -1,4 +1,3 @@
-
 # LUAD–LUSC Multimodal Fusion
 
 ### Does Fusion Stage Matter? Comparing Feature-Level and Decision-Level Multimodal Learning for Lung Cancer Subtyping
@@ -85,19 +84,9 @@ Early fusion integrates modality-specific features before classification.
 
 Given feature vectors from $M$ modalities, the fused representation is constructed as:
 
-$$
-\mathbf{x}_{\mathrm{early}}
-=
-\left[
-\mathbf{x}^{(1)}
-\Vert
-\mathbf{x}^{(2)}
-\Vert
-\cdots
-\Vert
-\mathbf{x}^{(M)}
-\right]
-$$
+```math
+\mathbf{x}_{\mathrm{early}} = \left[ \mathbf{x}^{(1)} \Vert \mathbf{x}^{(2)} \Vert \cdots \Vert \mathbf{x}^{(M)} \right]
+```
 
 where $\Vert$ represents feature concatenation.
 
@@ -111,26 +100,17 @@ Late fusion trains independent classifiers for individual modalities and combine
 
 For modality $m$:
 
-$$
-\hat{\mathbf{p}}^{(m)}
-=
-f_m\left(\mathbf{x}^{(m)}\right)
-$$
+```math
+\hat{\mathbf{p}}^{(m)} = f_m\left(\mathbf{x}^{(m)}\right)
+```
 
 where $f_m$ is the modality-specific classifier and $\hat{\mathbf{p}}^{(m)}$ denotes its predicted class probabilities.
 
 The combined prediction is obtained using:
 
-$$
-\hat{y}
-=
-g\left(
-\hat{\mathbf{p}}^{(1)},
-\hat{\mathbf{p}}^{(2)},
-\ldots,
-\hat{\mathbf{p}}^{(M)}
-\right)
-$$
+```math
+\hat{y} = g\left( \hat{\mathbf{p}}^{(1)}, \hat{\mathbf{p}}^{(2)}, \ldots, \hat{\mathbf{p}}^{(M)} \right)
+```
 
 where $g$ represents the selected decision-aggregation rule.
 
