@@ -1,132 +1,251 @@
-# Does Fusion Stage Matter? Comparing Feature-Level and Decision-Level Multimodal Learning for Lung Cancer Subtyping
+# LUAD–LUSC Multimodal Fusion
 
-**Women in Machine Learning (WiML) Workshop at NeurIPS 2026 | Atlanta, USA**
+### Does Fusion Stage Matter? Comparing Feature-Level and Decision-Level Multimodal Learning for Lung Cancer Subtyping
 
-**Researcher:** Gloria Moraa Riechi  
-**Affiliation:** Department of Computational Data Science and Engineering, North Carolina A&T State University  
-**Contact:** gmriechi@aggies.ncat.edu
+**Women in Machine Learning (WiML) Workshop @ NeurIPS 2026**
 
-**[View Accepted Abstract on OpenReview](https://openreview.net/forum?id=7Rp07uEd5s)**
+**Author:** Gloria Moraa Riechi  
+**Affiliation:** Department of Computational Data Science and Engineering, North Carolina A&T State University, Greensboro, NC, USA
 
-## Overview
+📄 **[Accepted Research Abstract (PDF)](https://openreview.net/pdf?id=7Rp07uEd5s)**
 
-Multimodal machine learning integrates heterogeneous biological and clinical information to improve disease classification. However, the benefits of combining additional modalities may depend on both the informativeness of individual data sources and the stage at which they are integrated.
+---
 
-This research investigates whether **feature-level early fusion or decision-level late fusion** provides better classification performance for lung adenocarcinoma (LUAD) and lung squamous cell carcinoma (LUSC).
+## 1. Overview
 
-Using a matched cohort of 823 patients from The Cancer Genome Atlas (TCGA), we compare unimodal and multimodal classification across four data modalities and multiple machine-learning algorithms.
+Multimodal machine learning enables the integration of heterogeneous molecular, histopathological, and clinical information for cancer classification. However, incorporating additional data modalities does not necessarily improve predictive performance, particularly when individual modalities already provide highly discriminative information.
 
-The study evaluates whether adding more modalities consistently improves prediction and whether the choice of fusion strategy influences classification performance.
+This study investigates how the **stage of multimodal integration** influences the classification of lung adenocarcinoma (LUAD) and lung squamous cell carcinoma (LUSC).
 
-## Research Objectives
+Using a matched cohort of **823 patients from The Cancer Genome Atlas (TCGA)**, we systematically compare two multimodal integration strategies:
 
-1. Compare feature-level early fusion and decision-level late fusion for LUAD–LUSC classification.
-2. Evaluate the predictive contribution of RNA-Seq, DNA methylation, histopathology, and clinical data.
-3. Assess fusion strategies under an equal-feature comparison.
-4. Examine modality contributions using ablation analysis.
+- **Feature-level early fusion:** Combines features from multiple modalities before classification.
+- **Decision-level late fusion:** Combines predictions from independently trained modality-specific classifiers.
 
-## Dataset
+The study evaluates multiple modality combinations, six classical machine-learning classifiers, and a controlled equal-feature setting to investigate whether fusion strategy and modality informativeness influence classification performance.
 
-**Source:** The Cancer Genome Atlas (TCGA)
+### Research Questions
 
-**Classification task:** LUAD versus LUSC
+1. Does decision-level late fusion outperform feature-level early fusion for LUAD–LUSC classification?
+2. Does incorporating additional modalities consistently improve performance over an RNA-Seq-only baseline?
+3. How does the contribution of individual modalities influence multimodal classification outcomes?
 
-**Matched cohort:** 823 patients
+## 2. Dataset and Study Design
 
-| Modality | Data representation |
+### Data Source
+
+Data were obtained from **The Cancer Genome Atlas (TCGA)**, specifically the lung adenocarcinoma (TCGA-LUAD) and lung squamous cell carcinoma (TCGA-LUSC) projects.
+
+| Characteristic | Description |
 |---|---|
-| RNA-Seq | Gene expression features |
-| DNA methylation | Epigenetic features |
-| Histopathology | Whole-slide image (WSI) embeddings |
-| Clinical | Patient clinical variables |
+| Data source | TCGA-LUAD and TCGA-LUSC |
+| Classification task | Binary LUAD vs. LUSC |
+| Matched cohort | 823 patients |
+| Training set | 578 patients |
+| Held-out test set | 245 patients |
+| Modalities | RNA-Seq, DNA methylation, histopathology, clinical data |
+| Primary feature setting | 40 features per modality |
 
-The primary equal-feature analysis retains 40 features per modality.
+### Data Modalities
 
-Raw patient-level data are not redistributed in this repository. Researchers should obtain the applicable datasets from authorized TCGA data sources and follow the relevant data-access requirements.
+The study integrates four complementary sources of information:
 
-## Methodology
+| Modality | Representation |
+|---|---|
+| RNA-Seq | Transcriptomic gene expression features |
+| DNA methylation | Epigenetic methylation features |
+| Histopathology | Whole-slide image (WSI) representations |
+| Clinical data | Patient-level clinical variables |
 
-### 1. Data Preparation
+All experiments use the same matched patient cohort to support controlled comparisons across modality combinations and fusion strategies.
 
-Patients with matched multimodal information were selected to maintain consistent cohort composition across experiments.
+## 3. Methodology
 
-Feature preprocessing and dimensionality reduction were performed using training data to avoid information leakage.
+### 3.1 Data Preprocessing and Feature Extraction
 
-Histopathology representations were derived using attention-based multiple instance learning (ABMIL), followed by training-only dimensionality reduction.
+Each modality underwent preprocessing and feature preparation before model training.
 
-### 2. Feature-Level Early Fusion
+The workflow included:
 
-Early fusion combines selected features from different modalities into a single representation before classification.
+1. Matching patients across TCGA molecular, histopathological, and clinical datasets.
+2. Establishing consistent training and held-out test partitions.
+3. Preparing modality-specific feature representations.
+4. Extracting histopathology features using attention-based multiple instance learning (ABMIL).
+5. Applying dimensionality reduction, including training-only principal component analysis (PCA), where appropriate.
+6. Constructing equal-feature representations containing 40 features per modality.
 
-The combined representation is supplied to a machine-learning classifier.
+The equal-feature setting was used for the primary controlled comparison, while original modality-specific representations were retained for sensitivity analysis.
 
-### 3. Decision-Level Late Fusion
+Preprocessing operations requiring parameter estimation were restricted to training data to reduce information leakage.
 
-Late fusion trains modality-specific classifiers independently and combines their predictions to generate a final classification.
+### 3.2 Feature-Level Early Fusion
 
-This approach allows each modality to contribute through its own predictive model rather than requiring direct feature concatenation.
+Early fusion integrates modality-specific features before classification.
 
-### 4. Model Evaluation
+Given feature vectors from \(M\) modalities, the fused representation is constructed as:
 
-Six classical machine-learning classifiers were evaluated across unimodal and multimodal configurations.
+\[
+\mathbf{x}_{\mathrm{early}}
+=
+[\mathbf{x}^{(1)} \Vert \mathbf{x}^{(2)} \Vert \cdots \Vert \mathbf{x}^{(M)}]
+\]
 
-Evaluation metrics included:
+where \(\Vert\) represents feature concatenation.
 
-- Classification accuracy
-- Macro-F1 score
-- Area under the ROC curve (AUC-ROC)
+The combined representation is then used to train a single classification model.
+
+Under the equal-feature setting, the full four-modality representation contains **160 features**, comprising 40 features from each modality.
+
+### 3.3 Decision-Level Late Fusion
+
+Late fusion trains independent classifiers for individual modalities and combines their predictions to obtain the final classification.
+
+For modality \(m\):
+
+\[
+\hat{\mathbf{p}}^{(m)}=f_m(\mathbf{x}^{(m)})
+\]
+
+where \(f_m\) is the modality-specific classifier and \(\hat{\mathbf{p}}^{(m)}\) denotes its predicted class probabilities.
+
+The combined prediction is obtained using:
+
+\[
+\hat{y}
+=
+g(\hat{\mathbf{p}}^{(1)},\hat{\mathbf{p}}^{(2)},\ldots,\hat{\mathbf{p}}^{(M)})
+\]
+
+where \(g\) represents the selected decision-aggregation rule.
+
+This approach allows modality-specific models to learn independently while integrating their predictions during final decision-making.
+
+### 3.4 Experimental Configurations
+
+The study evaluated progressively larger modality combinations:
+
+| Configuration | Included modalities |
+|---|---|
+| RNA-Seq baseline | RNA-Seq |
+| Omics | RNA-Seq + DNA methylation |
+| Clinical + Omics | RNA-Seq + DNA methylation + clinical data |
+| Four-modality fusion | RNA-Seq + DNA methylation + clinical data + histopathology WSI |
+
+Both early and late fusion were evaluated for multimodal configurations.
+
+### 3.5 Model Training and Evaluation
+
+Six classical machine-learning classifiers were evaluated under a consistent experimental protocol.
+
+Model and fusion-rule selection used out-of-fold predictions from the training data. The held-out test set was reserved for final performance evaluation.
+
+The following metrics were considered:
+
+- Accuracy
+- Macro-averaged F1 score
+- Area under the receiver operating characteristic curve (AUC-ROC)
 - Sensitivity
 - Specificity
 
-Out-of-fold predictions from the training data were used for model and fusion-rule selection, with a held-out test set reserved for final evaluation.
+This controlled experimental design was intended to reduce differences attributable to cohort composition, feature dimensionality, and evaluation procedures.
 
-## Experimental Results
+## 4. Experimental Results
 
-| Model configuration | Strategy | Accuracy | AUC-ROC |
+### 4.1 Classification Performance
+
+The primary equal-feature analysis produced the following results:
+
+| Model Configuration | Fusion Strategy | Accuracy (%) | AUC-ROC |
 |---|---|---:|---:|
-| RNA-Seq only | Unimodal | 97.55% | 0.9992 |
-| Omics | Early fusion | 97.14% | 0.9987 |
-| Omics | Late fusion | 97.14% | 0.9975 |
-| Clinical + Omics | Early fusion | 96.73% | 0.9985 |
-| Clinical + Omics | Late fusion | 97.14% | 0.9977 |
-| Four modalities | Early fusion | 96.33% | 0.9928 |
-| Four modalities | Late fusion | **97.96%** | 0.9935 |
+| RNA-Seq only | Unimodal | 97.55 | **0.9992** |
+| Omics | Early | 97.14 | 0.9987 |
+| Omics | Late | 97.14 | 0.9975 |
+| Clinical + Omics | Early | 96.73 | 0.9985 |
+| Clinical + Omics | Late | 97.14 | 0.9977 |
+| Four modalities | Early | 96.33 | 0.9928 |
+| Four modalities | Late | **97.96** | 0.9935 |
 
-### Key Findings
+### 4.2 Key Findings
 
-**RNA-Seq is highly predictive.** RNA-Seq alone achieved 97.55% accuracy and the highest reported AUC-ROC of 0.9992.
+**RNA-Seq provides strong standalone discrimination.**
 
-**Late fusion achieved the highest observed accuracy.** With all four modalities, late fusion achieved 97.96% accuracy compared with 96.33% for early fusion.
+RNA-Seq alone achieved 97.55% classification accuracy and the highest reported AUC-ROC of 0.9992. This indicates that transcriptomic information contains substantial predictive signal for distinguishing LUAD from LUSC.
 
-**Additional modalities did not consistently improve performance.** Results demonstrate that multimodal integration does not necessarily outperform an informative unimodal baseline.
+**Multimodal integration does not consistently improve performance.**
 
-### Ablation Analysis
+Adding DNA methylation, clinical information, and histopathology did not uniformly outperform the RNA-Seq-only baseline.
 
-Removing RNA-Seq from the four-modality late-fusion model reduced accuracy from 97.96% to 95.10%, representing a decline of 2.86 percentage points.
+**Late fusion achieves the highest observed classification accuracy.**
 
-These findings suggest that RNA-Seq contributed substantially to classification performance.
+In the full four-modality setting, decision-level late fusion achieved 97.96% accuracy, compared with 96.33% for feature-level early fusion—a difference of 1.63 percentage points.
 
-The reported performance differences are descriptive and should not be interpreted as statistically significant without additional inferential analysis.
+**Accuracy and AUC-ROC identify different leading configurations.**
 
-## Reproducibility
+Although late fusion achieved the highest observed accuracy, RNA-Seq alone achieved the highest AUC-ROC. This distinction highlights the importance of evaluating multiple classification metrics.
 
-This repository is intended to provide the implementation of the study's preprocessing, feature extraction, fusion strategies, model evaluation, and result visualization.
+### 4.3 Ablation Analysis
 
-Reproduction requires access to the relevant TCGA datasets and the study's preprocessing and model configurations.
+Modality-removal experiments were performed to assess the contribution of individual information sources.
 
-Installation instructions, execution commands, dependencies, and the final repository directory structure will be documented alongside the released implementation.
+Removing RNA-Seq from the full late-fusion model reduced accuracy from **97.96% to 95.10%**, representing a decline of **2.86 percentage points**.
 
-## Citation
+This was the largest reported decline following removal of an individual modality, indicating that RNA-Seq contributed substantially to multimodal classification performance.
 
-If you use this work, please cite the accepted WiML submission:
+## 5. Discussion
 
-Riechi, G. M. (2026). *Does Fusion Stage Matter? Comparing Feature-Level and Decision-Level Multimodal Learning for Lung Cancer Subtyping*. Women in Machine Learning Workshop, NeurIPS 2026.
+The findings demonstrate that multimodal learning performance depends not only on the number and type of modalities included but also on their individual predictive contributions and the strategy used to integrate them.
 
-https://openreview.net/forum?id=7Rp07uEd5s
+RNA-Seq provided sufficiently strong discrimination that additional modalities offered limited and inconsistent improvements. Nevertheless, late fusion achieved higher observed accuracy than early fusion when all four heterogeneous modalities were combined.
 
-## Contact
+These observations suggest that decision-level integration can be beneficial when combining substantially different molecular, clinical, and histopathological representations.
+
+However, the performance differences are descriptive. Statistical significance has not been established, and the findings should not be interpreted as evidence of consistent superiority across independent cohorts.
+
+## 6. Reproducibility
+
+The repository is intended to provide the implementation supporting the reported experiments, including:
+
+- Multimodal cohort preparation and preprocessing
+- Feature extraction and dimensionality reduction
+- Early-fusion and late-fusion model implementations
+- Model training and fusion-rule selection
+- Performance evaluation
+- Modality ablation experiments
+- Result visualization
+
+The experimental workflow follows:
+
+**TCGA data → Cohort matching → Feature extraction → Fusion strategies → Model training → Held-out evaluation → Results**
+
+Execution instructions and software dependencies should be documented using the final released source files and configurations.
+
+## 7. Data Availability
+
+Data originate from [The Cancer Genome Atlas (TCGA)](https://portal.gdc.cancer.gov/).
+
+Raw patient-level datasets and restricted data are not redistributed through this repository. Researchers should obtain the relevant datasets through authorized TCGA access channels.
+
+## 8. Citation
+
+If you use this work, please cite the accepted WiML @ NeurIPS 2026 submission:
+
+```bibtex
+@inproceedings{
+riechi2026does,
+title={Does Fusion Stage Matter? Comparing Feature-Level and Decision-Level Multimodal Learning for Lung Cancer Subtyping},
+author={Gloria Moraa Riechi},
+booktitle={Women in Machine Learning Workshop @ NeurIPS 2026},
+year={2026},
+url={https://openreview.net/forum?id=7Rp07uEd5s}
+}
+```
+
+**[Read the Accepted Abstract (PDF)](https://openreview.net/pdf?id=7Rp07uEd5s)**
+
+## 9. Contact
 
 **Gloria Moraa Riechi**  
 Department of Computational Data Science and Engineering  
-North Carolina A&T State University  
-gmriechi@aggies.ncat.edu
+North Carolina A&T State University
+
+**Email:** gmriechi@aggies.ncat.edu
