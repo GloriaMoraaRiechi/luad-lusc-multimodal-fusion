@@ -1,3 +1,4 @@
+
 # LUAD–LUSC Multimodal Fusion
 
 ### Does Fusion Stage Matter? Comparing Feature-Level and Decision-Level Multimodal Learning for Lung Cancer Subtyping
@@ -82,15 +83,23 @@ Preprocessing operations requiring parameter estimation were restricted to train
 
 Early fusion integrates modality-specific features before classification.
 
-Given feature vectors from \(M\) modalities, the fused representation is constructed as:
+Given feature vectors from $M$ modalities, the fused representation is constructed as:
 
-\[
+$$
 \mathbf{x}_{\mathrm{early}}
 =
-[\mathbf{x}^{(1)} \Vert \mathbf{x}^{(2)} \Vert \cdots \Vert \mathbf{x}^{(M)}]
-\]
+\left[
+\mathbf{x}^{(1)}
+\Vert
+\mathbf{x}^{(2)}
+\Vert
+\cdots
+\Vert
+\mathbf{x}^{(M)}
+\right]
+$$
 
-where \(\Vert\) represents feature concatenation.
+where $\Vert$ represents feature concatenation.
 
 The combined representation is then used to train a single classification model.
 
@@ -100,23 +109,30 @@ Under the equal-feature setting, the full four-modality representation contains 
 
 Late fusion trains independent classifiers for individual modalities and combines their predictions to obtain the final classification.
 
-For modality \(m\):
+For modality $m$:
 
-\[
-\hat{\mathbf{p}}^{(m)}=f_m(\mathbf{x}^{(m)})
-\]
+$$
+\hat{\mathbf{p}}^{(m)}
+=
+f_m\left(\mathbf{x}^{(m)}\right)
+$$
 
-where \(f_m\) is the modality-specific classifier and \(\hat{\mathbf{p}}^{(m)}\) denotes its predicted class probabilities.
+where $f_m$ is the modality-specific classifier and $\hat{\mathbf{p}}^{(m)}$ denotes its predicted class probabilities.
 
 The combined prediction is obtained using:
 
-\[
+$$
 \hat{y}
 =
-g(\hat{\mathbf{p}}^{(1)},\hat{\mathbf{p}}^{(2)},\ldots,\hat{\mathbf{p}}^{(M)})
-\]
+g\left(
+\hat{\mathbf{p}}^{(1)},
+\hat{\mathbf{p}}^{(2)},
+\ldots,
+\hat{\mathbf{p}}^{(M)}
+\right)
+$$
 
-where \(g\) represents the selected decision-aggregation rule.
+where $g$ represents the selected decision-aggregation rule.
 
 This approach allows modality-specific models to learn independently while integrating their predictions during final decision-making.
 
